@@ -4,7 +4,11 @@ const nameSubmit = document.querySelector("#name");
 const titleSubmit = document.querySelector("#title");
 const storySubmit = document.querySelector("#story");
 const DISCUSSIONS_KEY = "discussions";
-// const listTitle = document.querySelector(".discussion__title a");
+const firstButton = document.querySelector(".first");
+const previousButton = document.querySelector(".previous");
+const nextButton = document.querySelector(".next");
+const lastButton = document.querySelector(".last");
+let page = 0;
 
 // convertToDiscussion은 아고라 스테이츠 데이터를 DOM으로 바꿔줍니다.
 const convertToDiscussion = (obj) => {
@@ -50,19 +54,22 @@ const convertToDiscussion = (obj) => {
   const discussionAnswered = document.createElement("div");
   discussionAnswered.className = "discussion__answered";
 
-  const discussionAsrSign = document.createElement("p");
-  discussionAsrSign.textContent = obj.answer === null ? "😵" : "🙆‍♂️";
-  discussionAnswered.append(discussionAsrSign);
-
   const discussionDeleteButton = document.createElement("button");
-  discussionDeleteButton.textContent = "❌";
+  discussionDeleteButton.className = "deleteButton";
+  discussionDeleteButton.textContent = "𐄂";
   discussionDeleteButton.addEventListener("click", deleteList);
   discussionAnswered.append(discussionDeleteButton);
 
   const discussionEditButton = document.createElement("button");
+  discussionEditButton.className = "editButton";
   discussionEditButton.textContent = "✏️";
   discussionEditButton.addEventListener("click", editList);
   discussionAnswered.append(discussionEditButton);
+
+  const discussionAsrSign = document.createElement("p");
+  discussionAsrSign.className = "asrSign";
+  discussionAsrSign.textContent = obj.answer === null ? "😵" : "✓";
+  discussionAnswered.append(discussionAsrSign);
 
   // TODO: 객체 하나에 담긴 정보를 DOM에 적절히 넣어주세요.
   li.append(avatarWrapper, discussionContent, discussionAnswered);
@@ -70,8 +77,8 @@ const convertToDiscussion = (obj) => {
 };
 
 // agoraStatesDiscussions 배열의 모든 데이터를 화면에 렌더링하는 함수입니다.
-const render = (element) => {
-  for (let i = 0; i < agoraStatesDiscussions.length; i += 1) {
+const render = (element, page) => {
+  for (let i = page; i < agoraStatesDiscussions.length; i += 1) {
     element.append(convertToDiscussion(agoraStatesDiscussions[i]));
   }
   return;
@@ -136,7 +143,14 @@ const savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
 
 if (savedDiscussions !== null) {
   agoraStatesDiscussions = JSON.parse(savedDiscussions);
-  render(ul);
+  render(ul, page);
 } else {
-  render(ul);
+  render(ul, page);
 }
+
+// Pagination 작업중
+
+// nextButton.addEventListener("click", () => {
+//   ul.innerHTML = "";
+//   render(ul, page + 10)
+// });
