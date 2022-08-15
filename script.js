@@ -4,11 +4,6 @@ const nameSubmit = document.querySelector("#name");
 const titleSubmit = document.querySelector("#title");
 const storySubmit = document.querySelector("#story");
 const DISCUSSIONS_KEY = "discussions";
-const firstButton = document.querySelector(".first");
-const previousButton = document.querySelector(".previous");
-const nextButton = document.querySelector(".next");
-const lastButton = document.querySelector(".last");
-let page = 0;
 
 // convertToDiscussion은 아고라 스테이츠 데이터를 DOM으로 바꿔줍니다.
 const convertToDiscussion = (obj) => {
@@ -42,12 +37,6 @@ const convertToDiscussion = (obj) => {
   discussionInformation.textContent = `${obj.author} / ${
     date.getMonth() + 1
   }월 ${date.getDate()}일 ${date.toLocaleTimeString()}`;
-  //   date.getHours() < 12
-  //     ? "오전 " + String(date.getHours()).padStart(2, 0)
-  //     : "오후 " + String(date.getHours() - 12).padStart(2, 0)
-  // }:${String(date.getMinutes()).padStart(2, 0)}:${String(
-  //   date.getSeconds()
-  // ).padStart(2, 0)}`;
   discussionInformation.className = "discussion__information";
   discussionContent.append(discussionInformation);
 
@@ -77,8 +66,17 @@ const convertToDiscussion = (obj) => {
 };
 
 // agoraStatesDiscussions 배열의 모든 데이터를 화면에 렌더링하는 함수입니다.
-const render = (element, page) => {
-  for (let i = page; i < agoraStatesDiscussions.length; i += 1) {
+const render = (element, from, to) => {
+  console.log(from, to);
+  if (!from && !to) {
+    from = 0;
+    to = agoraStatesDiscussions.length;
+  }
+  // 다 지우고 배열에 있는 내용 다 보여주기
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+  for (let i = from; i < to; i++) {
     element.append(convertToDiscussion(agoraStatesDiscussions[i]));
   }
   return;
@@ -141,16 +139,57 @@ function editList(event) {
 // READ: 로컬스토리지에 discussion이 저장되어있으면 저장된 데이터를 리스트로 만든다.
 const savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
 
+// Pagination
+let limit = 10,
+  page = 1;
+
 if (savedDiscussions !== null) {
   agoraStatesDiscussions = JSON.parse(savedDiscussions);
-  render(ul, page);
+  render(ul, 0, limit);
 } else {
-  render(ul, page);
+  render(ul, 0, limit);
 }
 
-// Pagination 작업중
+const getPageStartEnd = (limit, page) => {
+  const len = agoraStatesDiscussions.length;
+  let pageStart = Number(page - 1) * Number(limit);
+  let pageEnd = Number(pageStart) + Number(limit);
+  if (page <= 0) {
+    pageStart = 0;
+  }
+  if (pageEnd >= len) {
+    pageEnd = len;
+  }
+  return { pageStart, pageEnd };
+};
 
-// nextButton.addEventListener("click", () => {
-//   ul.innerHTML = "";
-//   render(ul, page + 10)
-// });
+const firstButton = document.querySelector(".first");
+firstButton.addEventListener("click", () => {
+  page = 1;
+  render(ul, 0, limit);
+});
+
+const preButtons = document.querySelector(".previous");
+preButtons.addEventListener("click", () => {
+  if (page > 1) {
+    page = page - 1;
+  }
+  const { pageStart, pageEnd } = getPageStartEnd(limit, page);
+  render(ul, pageStart, pageEnd);
+});
+
+const nextButton = document.querySelector(".next");
+nextButton.addEventListener("click", () => {
+  if (limit * page < agoraStatesDiscussions.length) {
+    page = page + 1;
+  }
+  const { pageStart, pageEnd } = getPageStartEnd(limit, page);
+  render(ul, pageStart, pageEnd);
+});
+
+const lastButton = document.querySelector(".last");
+lastButton.addEventListener("click", () => {
+  page = Math.ceil(agoraStatesDiscussions.length / limit);
+  const { pageStart, pageEnd } = getPageStartEnd(limit, page);
+  render(ul, pageStart, pageEnd);
+});
