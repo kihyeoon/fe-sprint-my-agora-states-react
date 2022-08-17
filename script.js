@@ -4,6 +4,13 @@ const nameSubmit = document.querySelector("#name");
 const titleSubmit = document.querySelector("#title");
 const storySubmit = document.querySelector("#story");
 const DISCUSSIONS_KEY = "discussions";
+const url = `http://localhost:4000/discussions/`;
+
+fetch(url)
+  .then((response) => response.json())
+  .then((data) => {
+    let agoraStatesDiscussions = data;
+  });
 
 // convertToDiscussion은 아고라 스테이츠 데이터를 DOM으로 바꿔줍니다.
 const convertToDiscussion = (obj) => {
@@ -136,13 +143,14 @@ function editList(event) {
   console.log(agoraStatesDiscussions);
 }
 
-// READ: 로컬스토리지에 discussion이 저장되어있으면 저장된 데이터를 리스트로 만든다.
-const savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
-
-// Pagination
+// 한 페이지에 보여주는 데이터 갯수와 페이지 넘버를 정의
 let limit = 10,
   page = 1;
 
+// READ: 로컬스토리지에 discussions가 저장되어있으면 저장된 데이터를 리스트로 만듦
+const savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
+
+// 로컬스토리지에 저장된 데이터가 있으면 그것을 렌더링하고 아니면 fetch한 데이터를 렌더링
 if (savedDiscussions !== null) {
   agoraStatesDiscussions = JSON.parse(savedDiscussions);
   render(ul, 0, limit);
@@ -150,6 +158,7 @@ if (savedDiscussions !== null) {
   render(ul, 0, limit);
 }
 
+// Pagination구현
 const getPageStartEnd = (limit, page) => {
   const len = agoraStatesDiscussions.length;
   let pageStart = Number(page - 1) * Number(limit);
