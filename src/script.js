@@ -5,15 +5,15 @@ const titleSubmit = document.querySelector("#title");
 const storySubmit = document.querySelector("#story");
 const DISCUSSIONS_KEY = "discussions";
 require("./style.css");
-require("./data.js");
+let agoraStatesDiscussions = require("./data.js");
 
 // const url = `http://localhost:4000/discussions/`;
 
 // fetch(url)
 //   .then((response) => response.json())
 //   .then((data) => {
-    // let agoraStatesDiscussions = data;
-  // });
+// let agoraStatesDiscussions = data;
+// });
 
 // convertToDiscussion은 아고라 스테이츠 데이터를 DOM으로 바꿔줍니다.
 const convertToDiscussion = (obj) => {
@@ -151,7 +151,7 @@ let limit = 10,
   page = 1;
 
 // READ: 로컬스토리지에 discussions가 저장되어있으면 저장된 데이터를 리스트로 만듦
-const savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
+savedDiscussions = localStorage.getItem(DISCUSSIONS_KEY);
 
 // 로컬스토리지에 저장된 데이터가 있으면 그것을 렌더링하고 아니면 fetch한 데이터를 렌더링
 if (savedDiscussions !== null) {
