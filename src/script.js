@@ -5,6 +5,7 @@ const titleSubmit = document.querySelector("#title");
 const storySubmit = document.querySelector("#story");
 const DISCUSSIONS_KEY = "discussions";
 require("./style.css");
+require("./data.js");
 
 // const url = `http://localhost:4000/discussions/`;
 
